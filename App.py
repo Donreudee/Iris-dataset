@@ -1,153 +1,177 @@
-Jelinnnnnnn
-bluewhale_01
-ไม่ระบุ
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 22 13:38:38 2025
 
-Jelinnnnnnn จอมซ่าปรากฏตัว — 13:25
-สมริน มาแล้ว — 13:25
-𝓝𝓾𝓽 จอมซ่าปรากฏตัว — 13:26
-𝓝𝓾𝓽 — 13:27
-# Project2_GroupXX
-# Student IDs and Names:
-# 6XXXXXXXX Student Name 1
-# 6XXXXXXXX Student Name 2
-# 6XXXXXXXX Student Name 3
-ขยาย
-message.txt
-6 KB
+@author: User
+"""
+
 # app.py
 import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-ขยาย
-message.txt
-17 KB
-streamlit==1.30.0
-pandas==2.1.3
-numpy==1.24.4
-matplotlib==3.8.2
-seaborn==0.13.0
-scikit-learn==1.3.2
-plotly==5.18.0
-6531501040 Nattawut Pongkasem
-𝓝𝓾𝓽 — 13:34
-# app.py - Streamlit App for Iris Species Classifier
-# Project2_GroupXX
-
-import streamlit as st
-import pandas as pd
-import numpy as np
-ขยาย
-message.txt
-12 KB
-𝓝𝓾𝓽 — 14:28
-# app.py - Streamlit App for Iris Species Classifier
-# Project2_GroupXX
-
-import streamlit as st
-import pandas as pd
-import numpy as np
-ขยาย
-message.txt
-17 KB
-import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split
-ขยาย
-message.txt
-3 KB
-ชานมไข่มุก — 14:47
-ประเภทไฟล์ที่แนบ: unknown
-best_model.pkl
-1.02 KB
-streamlit
-pandas
-numpy
-matplotlib
-seaborn
-scikit-learn
-ขยาย
-requirements.txt
-1 KB
-﻿
-import streamlit as st
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split
+import pickle
+import os
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+import plotly.express as px
 
-# Set page configuration
+# Set page config
 st.set_page_config(
-    page_title="Iris Dataset Visualization",
+    page_title="Project2_GroupXX",
     page_icon="🌸",
     layout="wide"
 )
 
-# Function to load the dataset
+# Add custom CSS
+st.markdown("""
+<style>
+    .main-header {
+        font-size: 2.5rem;
+        color: #1E88E5;
+        text-align: center;
+    }
+    .sub-header {
+        font-size: 1.5rem;
+        color: #26A69A;
+    }
+    .info-text {
+        font-size: 1rem;
+    }
+    .highlight {
+        color: #FF7043;
+        font-weight: bold;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# App header
+st.markdown("<h1 class='main-header'>Iris Species Classifier</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center;'>A Business Application for Flower Classification</h3>", unsafe_allow_html=True)
+
+# Load data
 @st.cache_data
 def load_data():
     try:
-        # Try to load from file
-        data = pd.read_csv('iris.csv')
-        return data
+        df = pd.read_csv('iris.csv')
     except:
-        # If not available, return a sample or error
-        st.warning("Could not load the dataset. Using a sample dataset instead.")
-        # Create a minimal sample
-        return pd.DataFrame({
-            'sepal_length': [5.1, 6.2, 7.3],
-            'sepal_width': [3.5, 2.9, 2.9],
-            'petal_length': [1.4, 4.3, 6.3],
-            'petal_width': [0.2, 1.3, 1.8],
-            'species': ['setosa', 'versicolor', 'virginica']
-        })
+        data = {
+            'sepal_length': [5.1, 4.9, 4.7, 4.6, 5.0, 5.4, 4.6, 5.0, 4.4, 4.9],
+            'sepal_width': [3.5, 3.0, 3.2, 3.1, 3.6, 3.9, 3.4, 3.4, 2.9, 3.1],
+            'petal_length': [1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.5, 1.4, 1.5],
+            'petal_width': [0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1],
+            'species': ['setosa'] * 10
+        }
+        df = pd.DataFrame(data)
+    return df
 
-# Load data
 df = load_data()
 
-# Main app title
-st.title("🌸 Iris Dataset Visualization")
-st.markdown("### Pairplot of Iris Features by Species")
+# Load models
+@st.cache_resource
+def load_models():
+    models = {}
+    scaler = None
+    try:
+        model_files = os.listdir('models')
+        for file in model_files:
+            if file.endswith('.pkl'):
+                with open(f'models/{file}', 'rb') as f:
+                    if file == 'scaler.pkl':
+                        scaler = pickle.load(f)
+                    else:
+                        model_name = file.replace('.pkl', '').replace('_', ' ')
+                        models[model_name] = pickle.load(f)
+    except:
+        st.warning("Pre-trained models not found. Demo mode active.")
+    return models, scaler
 
-# Create and display pairplot
-fig = plt.figure(figsize=(12, 10))
-sns.pairplot(df, hue='species', markers=["o", "o", "o"], 
-             plot_kws={'alpha': 0.7, 's': 30}, 
-             diag_kind='kde', 
-             diag_kws={'alpha': 0.5, 'shade': True, 'bw_adjust': 0.8})
-plt.tight_layout()
-st.pyplot(fig)
+models, scaler = load_models()
 
-# Add a brief explanation
+# Fix page to Prediction
+page = "Prediction"
+
+# Prediction Page
+if page == "Prediction":
+    st.markdown("<h2 class='sub-header'>Make Predictions</h2>", unsafe_allow_html=True)
+
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        st.markdown("### Enter Flower Measurements")
+
+        sepal_length = st.slider("Sepal Length (cm)", 4.0, 8.0, 5.4, 0.1)
+        sepal_width = st.slider("Sepal Width (cm)", 2.0, 4.5, 3.4, 0.1)
+        petal_length = st.slider("Petal Length (cm)", 1.0, 7.0, 1.5, 0.1)
+        petal_width = st.slider("Petal Width (cm)", 0.1, 2.5, 0.2, 0.1)
+
+        input_data = [[sepal_length, sepal_width, petal_length, petal_width]]
+        input_df = pd.DataFrame(input_data, columns=['sepal_length', 'sepal_width', 'petal_length', 'petal_width'])
+
+        if st.button("Predict Species"):
+            if not models or not scaler:
+                # Demo mode prediction
+                if petal_length < 2.5:
+                    prediction = "setosa"
+                    probabilities = [0.95, 0.04, 0.01]
+                elif petal_length < 5.0:
+                    prediction = "versicolor"
+                    probabilities = [0.01, 0.89, 0.10]
+                else:
+                    prediction = "virginica"
+                    probabilities = [0.00, 0.12, 0.88]
+                st.success(f"Predicted species: {prediction.upper()}")
+
+                species_list = ["setosa", "versicolor", "virginica"]
+                proba_df = pd.DataFrame({
+                    'Species': species_list,
+                    'Probability': probabilities
+                })
+                fig = px.bar(proba_df, x='Species', y='Probability', color='Species', text='Probability')
+                fig.update_layout(yaxis_range=[0, 1])
+                st.plotly_chart(fig)
+
+                st.info("This is a demonstration prediction. In the actual deployment, predictions would be made using the trained model.")
+            else:
+                input_scaled = scaler.transform(input_data)
+                best_model = models.get('best model', next(iter(models.values())))
+                prediction = best_model.predict(input_scaled)[0]
+                probabilities = best_model.predict_proba(input_scaled)[0]
+
+                st.success(f"Predicted species: {prediction.upper()}")
+
+                species_list = best_model.classes_
+                proba_df = pd.DataFrame({
+                    'Species': species_list,
+                    'Probability': probabilities
+                })
+                fig = px.bar(proba_df, x='Species', y='Probability', color='Species')
+                fig.update_layout(yaxis_range=[0, 1])
+                st.plotly_chart(fig)
+
+    with col2:
+        st.markdown("### Visualization of Input")
+        fig = px.scatter(df, x='petal_length', y='petal_width', color='species', title='Your Input Compared to Dataset')
+        fig.add_scatter(x=[petal_length], y=[petal_width], mode='markers',
+                        marker=dict(size=15, symbol='star', color='yellow', line=dict(width=2, color='black')),
+                        name='Your Input')
+        st.plotly_chart(fig)
+
+        st.markdown("### Your Input Summary")
+        st.table(input_df)
+
+        st.markdown("### Reference Ranges by Species")
+        reference = pd.DataFrame({
+            'Measurement': ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'],
+            'Setosa': ['4.3-5.8 cm', '2.3-4.4 cm', '1.0-1.9 cm', '0.1-0.6 cm'],
+            'Versicolor': ['4.9-7.0 cm', '2.0-3.4 cm', '3.0-5.1 cm', '1.0-1.8 cm'],
+            'Virginica': ['4.9-7.9 cm', '2.2-3.8 cm', '4.5-6.9 cm', '1.4-2.5 cm']
+        })
+        st.table(reference)
+
+st.markdown("""---""")
 st.markdown("""
-### About This Visualization
-
-This pairplot shows the relationships between the four features of the Iris dataset:
-- Sepal Length
-- Sepal Width
-- Petal Length
-- Petal Width
-
-Each species is represented by a different color:
-- Blue: Iris Setosa
-- Orange: Iris Versicolor
-- Green: Iris Virginica
-
-The diagonal plots show the distribution of each feature for each species, while the scatter plots show the relationships between pairs of features.
-
-This visualization clearly shows how the three species cluster differently based on their measurements, particularly for petal dimensions.
-""")
-
-# Footer
-st.markdown("---")
-st.markdown("Iris Flower Classification for Horticultural Business Decision Support")
-message.txt
-3 KB
+<div style='text-align: center; color: gray; font-size: 0.8rem;'>
+    Project 2 - Data Modeling | GroupXX | 2025
+</div>
+""", unsafe_allow_html=True)
