@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 22 13:38:38 2025
-
-@author: User
+Project2_Group8
 """
 
 # app.py
@@ -176,6 +174,6 @@ if page == "Prediction":
 st.markdown("""---""")
 st.markdown("""
 <div style='text-align: center; color: gray; font-size: 0.8rem;'>
-    Project 2 - Data Modeling | GroupXX | 2025
+    Project 2 - Data Modeling | Group8 | 2025
 </div>
 """, unsafe_allow_html=True)
