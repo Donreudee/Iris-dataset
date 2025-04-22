@@ -16,7 +16,7 @@ import plotly.express as px
 
 # Set page config
 st.set_page_config(
-    page_title="Project2_GroupXX",
+    page_title="Project2_Group8",
     page_icon="🌸",
     layout="wide"
 )
